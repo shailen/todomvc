@@ -11,7 +11,7 @@ import 'package:todomvc/model.dart' show Todo;
 )
 class TodoController {
   List<Todo> todos = [];
-  String title;
+  String tempTitle;
 
   List<Todo> get completed => todos.where((todo) => todo.completed).toList();
 
@@ -21,12 +21,22 @@ class TodoController {
     todos.forEach((todo) => todo.completed = value);
   }
 
-  create(event) {
+
+  // Listen for KeyCode.ENTER on keypress but KeyCode.ESC on keyup, because
+  // IE doesn't fire keyup for ENTER.
+  keypressHandler(event) {
     if (event.keyCode == KeyCode.ENTER) {
-      if (title.trim().isNotEmpty) {
-        todos.add(new Todo(title));
-        title = '';
+      var title = tempTitle.trim();
+      if (title.isNotEmpty) {
+        todos.add(new Todo(title.trim()));
+        tempTitle = '';
       }
+    }
+  }
+
+  keyupHandler(event) {
+    if (event.keyCode == KeyCode.ESC) {
+      tempTitle = '';
     }
   }
 
