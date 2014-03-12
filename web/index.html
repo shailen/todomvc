@@ -29,7 +29,8 @@
               <input class="edit" required
                 ng-model="todo.title"
                 ng-focus="ctrl.cacheTitle(todo)"
-                ng-keyup="ctrl.saveOrCancel($event, todo)">
+                ng-keyup="ctrl.saveOrCancel($event, todo)"
+                ng-blur="ctrl.doneEditing(todo)">
           </li>
         </ul>
       </section>

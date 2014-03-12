@@ -46,6 +46,7 @@ class TodoController {
   saveOrCancel(event, todo) {
     if (event.keyCode == KeyCode.ENTER) {
       var title = todo.title.trim();
+      // TODO: move validaton to model.
       if (title.isNotEmpty) {
         // TODO: use better test for whether this is a new or existing todo.
         if (todo == newTodo) {
@@ -54,10 +55,20 @@ class TodoController {
           editedTodo = null;
           _titleCache = "";
         }
+      } else {
+        // TODO: remove todo from todos
       }
     } else if (event.keyCode == KeyCode.ESC) {
       _reset(todo);
     }
+  }
+
+  doneEditing(Todo todo) {
+    if (todo.title.trim().isEmpty) {
+      todos.remove(todo);
+    }
+
+    editedTodo = null;
   }
 
   remove(Todo todo) {
