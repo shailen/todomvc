@@ -11,7 +11,13 @@ import 'package:todomvc/model.dart' show Todo;
 )
 class TodoController {
   List<Todo> todos = [];
-  String tempTitle;
+  String _titleCache;
+  Todo newTodo = new Todo();
+  Todo editedTodo;
+
+  cacheTitle(Todo todo) {
+    _titleCache = todo.title;
+  }
 
   List<Todo> get completed => todos.where((todo) => todo.completed).toList();
 
@@ -21,24 +27,40 @@ class TodoController {
     todos.forEach((todo) => todo.completed = value);
   }
 
+  void editTodo(Todo todo) {
+    editedTodo = todo;
+    _titleCache = todo.title;
+  }
 
-  // Listen for KeyCode.ENTER on keypress but KeyCode.ESC on keyup, because
-  // IE doesn't fire keyup for ENTER.
-  keypressHandler(event) {
+  _save(Todo todo) {
+    todos.add(newTodo);
+    newTodo = new Todo();
+  }
+
+  _reset(Todo todo) {
+    todo.title = _titleCache;
+    _titleCache = '';
+    editedTodo = null;
+  }
+
+  saveOrCancel(event, todo) {
     if (event.keyCode == KeyCode.ENTER) {
-      var title = tempTitle.trim();
+      var title = todo.title.trim();
       if (title.isNotEmpty) {
-        todos.add(new Todo(title.trim()));
-        tempTitle = '';
+        // TODO: use better test for whether this is a new or existing todo.
+        if (todo == newTodo) {
+          _save(todo);
+        } else {
+          editedTodo = null;
+          _titleCache = "";
+        }
       }
+    } else if (event.keyCode == KeyCode.ESC) {
+      _reset(todo);
     }
   }
 
-  keyupHandler(event) {
-    if (event.keyCode == KeyCode.ESC) {
-      tempTitle = '';
-    }
-  }
+
 
   void clearCompleted() {
     todos.removeWhere((todo) => todo.completed);
