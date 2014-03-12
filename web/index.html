@@ -5,80 +5,84 @@
     <title>Template • TodoMVC</title>
     <link rel="stylesheet" href="base.css">
   </head>
-  <body todo-controller>
-    <section id="todoapp">
-      <header id="header">
-        <h1>todos</h1>
-          <!-- need keyup for escape; -->
-          <input id="new-todo" placeholder="What needs to be done?" autofocus
-            ng-model="ctrl.newTodo.title"
-            ng-keypress="ctrl.keypressAction($event, ctrl.newTodo)"
-            ng-keyup="ctrl.keyupAction($event, ctrl.newTodo)">
-      </header>
+  <body>
+    <ng-view>
+      <section id="todoapp" todo-controller>
+        <header id="header">
+          <h1>todos</h1>
+            <input id="new-todo" placeholder="What needs to be done?" autofocus
+              ng-model="ctrl.newTodo.title"
+              ng-keypress="ctrl.keypressAction($event, ctrl.newTodo)"
+              ng-keyup="ctrl.keyupAction($event, ctrl.newTodo)">
+        </header>
 
-      <section id="main" ng-if="ctrl.todos.isNotEmpty">
-        <input id="toggle-all" type="checkbox" ng-model="ctrl.allChecked">
-        <label for="toggle-all">Mark all as complete</label>
-        <ul id="todo-list">
-          <li ng-repeat="todo in ctrl.todos" ng-class="{
-              completed: todo.completed, editing: todo == ctrl.editedTodo}">
-            <div class="view">
-              <input class="toggle" type="checkbox" ng-model="todo.completed"
-                  ng-unless="ctrl.editing">
-              <label ng-doubleclick="ctrl.editTodo($event, todo)">{{todo.title}}</label>
-              <button class="destroy" ng-click="ctrl.remove(todo)"></button>
-            </div>
-              <!-- is adding autofocus here cheating? -->
-              <input class="edit" autofocus
-                ng-model="todo.title"
-                ng-keyup="ctrl.keyupAction($event, todo)"
-                ng-keypress="ctrl.keypressAction($event, todo)"
-                ng-blur="ctrl.blurAction($event, todo)"
-              >
-          </li>
-        </ul>
+        <section id="main" ng-if="ctrl.todos.isNotEmpty">
+          <input id="toggle-all" type="checkbox" ng-model="ctrl.allChecked">
+          <label for="toggle-all">Mark all as complete</label>
+          <ul id="todo-list">
+            <li ng-repeat="todo in ctrl.todos | filter:ctrl.filter" ng-class="{
+                completed: todo.completed, editing: todo == ctrl.editedTodo}">
+              <div class="view">
+                <input class="toggle" type="checkbox" ng-model="todo.completed"
+                    ng-unless="ctrl.editing">
+                <label ng-doubleclick="ctrl.editTodo($event, todo)">{{todo.title}}</label>
+                <button class="destroy" ng-click="ctrl.remove(todo)"></button>
+              </div>
+                <!-- TODO: the input needs focus(). Use a directive. -->
+                <input class="edit"
+                  ng-model="todo.title"
+                  ng-keyup="ctrl.keyupAction($event, todo)"
+                  ng-keypress="ctrl.keypressAction($event, todo)"
+                  ng-blur="ctrl.blurAction($event, todo)">
+            </li>
+          </ul>
+        </section>
+
+        <footer id="footer" ng-if="ctrl.todos.isNotEmpty">
+          <span id="todo-count"><strong>{{ctrl.active.length}}</strong>
+            <ng-pluralize count="ctrl.active.length"
+                when="{ one: 'item left', other: 'items left' }">
+            </ng-pluralize>
+          </span>
+
+          <ul id="filters">
+            <li>
+              <a class="selected" href="#/">
+                {{ctrl.allString | capitalize}}
+              </a>
+            </li>
+            <li>
+              <a href="#/{{ctrl.activeString}}">
+                {{ctrl.activeString | capitalize}}
+              </a>
+            </li>
+            <li>
+              <a href="#/{{ctrl.completedString}}">
+                {{ctrl.completedString | capitalize}}
+              </a>
+            </li>
+          </ul>
+
+          <button id="clear-completed" ng-click="ctrl.clearCompleted()"
+              ng-if="ctrl.completed.length > 0">
+              Clear completed ({{ctrl.completed.length}})
+          </button>
+        </footer>
       </section>
-
-      <footer id="footer" ng-if="ctrl.todos.isNotEmpty">
-        <!-- This should be `0 items left` by default -->
-        <span id="todo-count"><strong>{{ctrl.remaining.length}}</strong>
-          <ng-pluralize count="ctrl.remaining.length"
-              when="{ one: 'item left', other: 'items left' }">
-          </ng-pluralize>
-        </span>
-
-<!--
-        <ul id="filters">
-          <li>
-            <a class="selected" href="#/">All</a>
-          </li>
-          <li>
-            <a href="#/active">Active</a>
-          </li>
-          <li>
-            <a href="#/completed">Completed</a>
-          </li>
-        </ul>
--->
-
-        <!-- Hidden if no completed items are left ↓ -->
-        <button id="clear-completed" ng-click="ctrl.clearCompleted()"
-            ng-if="ctrl.completed.length > 0">
-            Clear completed ({{ctrl.completed.length}})
-        </button>
+      </ng-view>
+      <footer id="info">
+        <p>Double-click to edit a todo</p>
+        <!-- Change this out with your name and url ↓ -->
+        <p>Created by <a href="http://todomvc.com">you</a></p>
+        <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
       </footer>
-    </section>
-    <footer id="info">
-      <p>Double-click to edit a todo</p>
-      <!-- Change this out with your name and url ↓ -->
-      <p>Created by <a href="http://todomvc.com">you</a></p>
-      <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
-    </footer>
-    <!-- Scripts here. Don't remove this ↓ -->
-    <!-- <script src="bower_components/todomvc-common/base.js"></script> -->
 
-    <script src="packages/shadow_dom/shadow_dom.min.js"></script>
-    <script type="application/dart" src="main.dart"></script>
-    <script src="packages/browser/dart.js"></script>
+      <!-- TODO: reninstate this before sending PR to todomvc -->
+      <!-- <script src="bower_components/todomvc-common/base.js"></script> -->
+
+      <script src="packages/shadow_dom/shadow_dom.min.js"></script>
+      <script type="application/dart" src="main.dart"></script>
+      <script src="packages/browser/dart.js"></script>
+
   </body>
 </html>

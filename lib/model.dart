@@ -12,4 +12,5 @@ class Todo {
   }
 
   bool get isValid => title.trim().isNotEmpty;
+  bool get isNotValid => !isValid;
 }
