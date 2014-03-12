@@ -1,6 +1,5 @@
 library todomvc.controller;
 
-import 'dart:async';
 import 'dart:html' show Element, KeyCode, querySelector;
 
 import 'package:angular/angular.dart';
@@ -22,17 +21,7 @@ class TodoController {
   List<Todo> get remaining => todos.where(
       (todo) => !completed.contains(todo)).toList();
 
-  bool _editing = false;
-  bool get editing => _editing;
-  void set editing(value) {
-    print('setting value of editing');
-    // Do the caching here.
-    _editing = value;
-  }
-
-  cacheTitle(Todo todo) {
-    _titleCache = todo.title;
-  }
+  bool editing = false;
 
   bool get allChecked => todos.every((todo) => todo.completed);
 
@@ -44,6 +33,7 @@ class TodoController {
     event.preventDefault();
     editedTodo = todo;
     _titleCache = todo.title;
+    editing = true;
   }
 
   save(Todo todo) {
@@ -56,13 +46,29 @@ class TodoController {
     }
   }
 
-  cancel(Todo todo) {
-    todo.title = '';
+  cancel(event, Todo todo) {
+    if (editing) {
+      todo.title = _titleCache;
+      // Clean up after editing
+      editedTodo = null;
+      _titleCache = '';
+      editing = false;
+    } else {
+      if (!todo.isSaved) {
+        todo.title = '';
+      }
+    }
+  }
+
+  blurAction(event, Todo todo) {
+    if (editing) {
+      cancel(event, todo);
+    }
   }
 
   keyupAction(event, todo) {
     if (event.keyCode == KeyCode.ESC) {
-      cancel(todo);
+      cancel(event, todo);
     }
   }
 
@@ -72,30 +78,6 @@ class TodoController {
       event.preventDefault();
       save(todo);
     }
-  }
-
-  saveOrCancel(event, todo) {
-//    if (event.keyCode == KeyCode.ENTER) {
-//      var title = todo.title.trim();
-//      // TODO: move validaton to model.
-//      if (title.isNotEmpty) {
-//        // TODO: use better test for whether this is a new or existing todo.
-//        if (todo == newTodo) {
-//          newTodo.title = newTodo.title.trim();
-//          todos.add(newTodo);
-//          newTodo = new Todo();
-//        } else {
-//          editedTodo = null;
-//          _titleCache = "";
-//        }
-//      } else {
-//        // TODO: remove todo from todos
-//      }
-//    } else if (event.keyCode == KeyCode.ESC) {
-//      todo.title = _titleCache;
-//      _titleCache = '';
-//      editedTodo = null;
-//    }
   }
 
   doneEditing(Todo todo) {
@@ -111,9 +93,5 @@ class TodoController {
 
   void clearCompleted() {
     todos.removeWhere((todo) => todo.completed);
-  }
-
-  edit(Todo todo) {
-    print('editing..........');
   }
 }

@@ -12,7 +12,6 @@
           <!-- need keyup for escape; -->
           <input id="new-todo" placeholder="What needs to be done?" autofocus
             ng-model="ctrl.newTodo.title"
-            ng-focus="ctrl.cacheTitle(ctrl.newTodo)"
             ng-keypress="ctrl.keypressAction($event, ctrl.newTodo)"
             ng-keyup="ctrl.keyupAction($event, ctrl.newTodo)">
       </header>
@@ -32,10 +31,10 @@
               <!-- is adding autofocus here cheating? -->
               <input class="edit" autofocus
                 ng-model="todo.title"
-                ng-click="ctrl.cacheTitle(todo)"
-                ng-focus="ctrl.editing = true"
-                ng-keyup="ctrl.saveOrCancel($event, todo)"
-                ng-blur="ctrl.doneEditing(todo)">
+                ng-keyup="ctrl.keyupAction($event, todo)"
+                ng-keypress="ctrl.keypressAction($event, todo)"
+                ng-blur="ctrl.blurAction($event, todo)"
+              >
           </li>
         </ul>
       </section>
