@@ -60,7 +60,9 @@ class TodoController {
     }
   }
 
-
+  remove(Todo todo) {
+    todos.remove(todo);
+  }
 
   void clearCompleted() {
     todos.removeWhere((todo) => todo.completed);
