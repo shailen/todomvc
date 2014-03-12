@@ -1,6 +1,7 @@
 library todomvc.controller;
 
-import 'dart:html' show Element, KeyCode;
+import 'dart:async';
+import 'dart:html' show Element, KeyCode, querySelector;
 
 import 'package:angular/angular.dart';
 import 'package:todomvc/model.dart' show Todo;
@@ -22,11 +23,10 @@ class TodoController {
       (todo) => !completed.contains(todo)).toList();
 
   bool _editing = false;
-
   bool get editing => _editing;
-
   void set editing(value) {
     print('setting value of editing');
+    // Do the caching here.
     _editing = value;
   }
 
@@ -46,42 +46,62 @@ class TodoController {
     _titleCache = todo.title;
   }
 
-  _save(Todo todo) {
-    todos.add(newTodo);
-    newTodo = new Todo();
+  save(Todo todo) {
+    todo.normalize();
+    if (todo.isValid) {
+      // Assume new Todo for now.
+      todo.title = newTodo.title.trim();
+      todos.add(newTodo);
+      newTodo = new Todo();
+    }
   }
 
-  _reset(Todo todo) {
-    todo.title = _titleCache;
-    _titleCache = '';
-    editedTodo = null;
+  cancel(Todo todo) {
+    todo.title = '';
+  }
+
+  keyupAction(event, todo) {
+    if (event.keyCode == KeyCode.ESC) {
+      cancel(todo);
+    }
+  }
+
+  keypressAction(event, todo) {
+    // This is needed because IE doesn't fire keyup for ENTER.
+    if (event.keyCode == KeyCode.ENTER) {
+      event.preventDefault();
+      save(todo);
+    }
   }
 
   saveOrCancel(event, todo) {
-    if (event.keyCode == KeyCode.ENTER) {
-      var title = todo.title.trim();
-      // TODO: move validaton to model.
-      if (title.isNotEmpty) {
-        // TODO: use better test for whether this is a new or existing todo.
-        if (todo == newTodo) {
-          _save(todo);
-        } else {
-          editedTodo = null;
-          _titleCache = "";
-        }
-      } else {
-        // TODO: remove todo from todos
-      }
-    } else if (event.keyCode == KeyCode.ESC) {
-      _reset(todo);
-    }
+//    if (event.keyCode == KeyCode.ENTER) {
+//      var title = todo.title.trim();
+//      // TODO: move validaton to model.
+//      if (title.isNotEmpty) {
+//        // TODO: use better test for whether this is a new or existing todo.
+//        if (todo == newTodo) {
+//          newTodo.title = newTodo.title.trim();
+//          todos.add(newTodo);
+//          newTodo = new Todo();
+//        } else {
+//          editedTodo = null;
+//          _titleCache = "";
+//        }
+//      } else {
+//        // TODO: remove todo from todos
+//      }
+//    } else if (event.keyCode == KeyCode.ESC) {
+//      todo.title = _titleCache;
+//      _titleCache = '';
+//      editedTodo = null;
+//    }
   }
 
   doneEditing(Todo todo) {
     if (todo.title.trim().isEmpty) {
       todos.remove(todo);
     }
-
     editedTodo = null;
   }
 

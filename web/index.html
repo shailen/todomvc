@@ -9,10 +9,12 @@
     <section id="todoapp">
       <header id="header">
         <h1>todos</h1>
+          <!-- need keyup for escape; -->
           <input id="new-todo" placeholder="What needs to be done?" autofocus
-              ng-model="ctrl.newTodo.title"
-              ng-focus="ctrl.cacheTitle(ctrl.newTodo)"
-              ng-keyup="ctrl.saveOrCancel($event, ctrl.newTodo)">
+            ng-model="ctrl.newTodo.title"
+            ng-focus="ctrl.cacheTitle(ctrl.newTodo)"
+            ng-keypress="ctrl.keypressAction($event, ctrl.newTodo)"
+            ng-keyup="ctrl.keyupAction($event, ctrl.newTodo)">
       </header>
 
       <section id="main" ng-if="ctrl.todos.isNotEmpty">
@@ -22,11 +24,13 @@
           <li ng-repeat="todo in ctrl.todos" ng-class="{
               completed: todo.completed, editing: todo == ctrl.editedTodo}">
             <div class="view">
-              <input class="toggle" type="checkbox" ng-model="todo.completed" ng-unless="ctrl.editing">
+              <input class="toggle" type="checkbox" ng-model="todo.completed"
+                  ng-unless="ctrl.editing">
               <label ng-doubleclick="ctrl.editTodo($event, todo)">{{todo.title}}</label>
               <button class="destroy" ng-click="ctrl.remove(todo)"></button>
             </div>
-              <input class="edit"
+              <!-- is adding autofocus here cheating? -->
+              <input class="edit" autofocus
                 ng-model="todo.title"
                 ng-click="ctrl.cacheTitle(todo)"
                 ng-focus="ctrl.editing = true"
