@@ -1,6 +1,6 @@
 library todomvc.controller;
 
-import 'dart:html' show KeyCode;
+import 'dart:html' show Element, KeyCode;
 
 import 'package:angular/angular.dart';
 import 'package:todomvc/model.dart' show Todo;
@@ -15,11 +15,24 @@ class TodoController {
   Todo newTodo = new Todo();
   Todo editedTodo;
 
+  List<Todo> get completed => todos.where(
+      (todo) => todo.completed).toList();
+
+  List<Todo> get remaining => todos.where(
+      (todo) => !completed.contains(todo)).toList();
+
+  bool _editing = false;
+
+  bool get editing => _editing;
+
+  void set editing(value) {
+    print('setting value of editing');
+    _editing = value;
+  }
+
   cacheTitle(Todo todo) {
     _titleCache = todo.title;
   }
-
-  List<Todo> get completed => todos.where((todo) => todo.completed).toList();
 
   bool get allChecked => todos.every((todo) => todo.completed);
 
@@ -27,7 +40,8 @@ class TodoController {
     todos.forEach((todo) => todo.completed = value);
   }
 
-  void editTodo(Todo todo) {
+  void editTodo(event, Todo todo) {
+    event.preventDefault();
     editedTodo = todo;
     _titleCache = todo.title;
   }

@@ -22,13 +22,14 @@
           <li ng-repeat="todo in ctrl.todos" ng-class="{
               completed: todo.completed, editing: todo == ctrl.editedTodo}">
             <div class="view">
-              <input class="toggle" type="checkbox" ng-model="todo.completed">
-              <label ng-doubleclick="ctrl.editTodo(todo)">{{todo.title}}</label>
+              <input class="toggle" type="checkbox" ng-model="todo.completed" ng-unless="ctrl.editing">
+              <label ng-doubleclick="ctrl.editTodo($event, todo)">{{todo.title}}</label>
               <button class="destroy" ng-click="ctrl.remove(todo)"></button>
             </div>
-              <input class="edit" required
+              <input class="edit"
                 ng-model="todo.title"
-                ng-focus="ctrl.cacheTitle(todo)"
+                ng-click="ctrl.cacheTitle(todo)"
+                ng-focus="ctrl.editing = true"
                 ng-keyup="ctrl.saveOrCancel($event, todo)"
                 ng-blur="ctrl.doneEditing(todo)">
           </li>
@@ -37,8 +38,13 @@
 
       <footer id="footer" ng-if="ctrl.todos.isNotEmpty">
         <!-- This should be `0 items left` by default -->
-        <span id="todo-count"><strong>1</strong> item left</span>
-        <!-- Remove this if you don't implement routing -->
+        <span id="todo-count"><strong>{{ctrl.remaining.length}}</strong>
+          <ng-pluralize count="ctrl.remaining.length"
+              when="{ one: 'item left', other: 'items left' }">
+          </ng-pluralize>
+        </span>
+
+<!--
         <ul id="filters">
           <li>
             <a class="selected" href="#/">All</a>
@@ -50,8 +56,13 @@
             <a href="#/completed">Completed</a>
           </li>
         </ul>
+-->
+
         <!-- Hidden if no completed items are left ↓ -->
-        <button id="clear-completed">Clear completed (1)</button>
+        <button id="clear-completed" ng-click="ctrl.clearCompleted()"
+            ng-if="ctrl.completed.length > 0">
+            Clear completed ({{ctrl.completed.length}})
+        </button>
       </footer>
     </section>
     <footer id="info">
