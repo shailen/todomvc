@@ -5,27 +5,11 @@ import 'dart:html' show Element, KeyCode, querySelector, window;
 import 'package:angular/angular.dart';
 import 'package:todomvc/model.dart' show Todo;
 
-import 'dart:async';
-
-/**
- * Capitalizes string.
- *
- * Usage:
- *
- *     {{ uppercase_expression | capitalize }}
- */
-@NgFilter(name:'capitalize')
-class CapitalizeFilter {
-  call(String text) => text == null ? text :
-    '${text.substring(0, 1).toUpperCase()}${text.substring(1)}';
-}
-
-
 @NgController(
     selector: '[todo-controller]',
     publishAs: 'ctrl'
 )
-class TodoController {
+class TodoController implements NgDetachAware {
   static const ACTIVE_STRING = 'active';
   static const COMPLETED_STRING = 'completed';
   static const ALL_STRING = 'all';
@@ -38,30 +22,28 @@ class TodoController {
   String _titleCache;
   Todo newTodo = new Todo();
   Todo editedTodo;
+  String filterString = "";
 
-  Http http;
-  Scope scope;
+  RouteHandle activeHandle, completedHandle, allHandle;
+
   Router router;
 
-  TodoController(this.http, this.scope, this.router) {
-    router.onRouteStart.listen((RouteStartEvent event) {
-      event.completed.then((result) {
-        if (result) {
-          if (event.uri == '/') {
-            filterString = '';
-          } else if (event.uri == '/$activeString') {
-            filterString = '$activeString';
-          } else if (event.uri == '/$completedString') {
-            filterString = '$completedString';
-          } else {
-            filterString = '';
-          }
-        }
-      });
-    });
+  TodoController(this.router) {
+    activeHandle = router.root.getRoute(ACTIVE_STRING).newHandle()
+        ..onEnter.listen((_) => filterString = 'active');
+
+    completedHandle = router.root.getRoute(COMPLETED_STRING).newHandle()
+        ..onEnter.listen((_) => filterString = 'completed');
+
+    allHandle = router.root.getRoute(ALL_STRING).newHandle()
+        ..onEnter.listen((_) => filterString = 'all');
   }
 
-  String filterString = "";
+  detach() {
+    activeHandle.discard();
+    completedHandle.discard();
+    allHandle.discard();
+  }
 
   bool filter(Todo todo) {
     if (filterString.isEmpty || filterString == ALL_STRING) {
@@ -94,8 +76,6 @@ class TodoController {
     editedTodo = todo;
     _titleCache = todo.title;
     editing = true;
-    // This doesn't work correctly.
-    event.target.parent.querySelector('input').focus();
   }
 
   _cleanup() {
@@ -119,7 +99,6 @@ class TodoController {
   keypressAction(event, todo) {
     // This is needed because IE doesn't fire keyup for ENTER.
     if (event.keyCode == KeyCode.ENTER) {
-      print('you pressed enter');
       todo.normalize();
       if (editing) {
         _updateOrRemove(todo);

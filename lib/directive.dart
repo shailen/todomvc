@@ -1,19 +1,20 @@
 import 'package:angular/angular.dart';
 import 'dart:html';
 
-import 'package:todomvc/model.dart' show Todo;
-
-
-@NgDirective(selector: '[acts-as-form-for]')
-class ActsAsFormFor implements NgAttachAware{
-  @NgOneWay("acts-as-form-for")
-  Todo todo;
+/**
+ * Provides focus to an element. Meant to be used with an <input type='text'>
+ */
+@NgDirective(
+  selector: '[todo-focus]'
+)
+class TodoFocus {
   Element el;
+  TodoFocus(this.el);
 
-  ActsAsFormFor(this.el);
-
-
-  attach(){
-    el.focus();
+  @NgOneWay('todo-focus')
+  set todoFocus(value) {
+   if (value) {
+     el.focus();
+   }
   }
 }

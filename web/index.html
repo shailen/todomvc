@@ -28,12 +28,12 @@
                 <label ng-doubleclick="ctrl.editTodo($event, todo)">{{todo.title}}</label>
                 <button class="destroy" ng-click="ctrl.remove(todo)"></button>
               </div>
-                <!-- TODO: the input needs focus(). Use a directive. -->
                 <input class="edit"
                   ng-model="todo.title"
                   ng-keyup="ctrl.keyupAction($event, todo)"
                   ng-keypress="ctrl.keypressAction($event, todo)"
-                  ng-blur="ctrl.blurAction($event, todo)">
+                  ng-blur="ctrl.blurAction($event, todo)"
+                  todo-focus="todo == ctrl.editedTodo">
             </li>
           </ul>
         </section>
@@ -69,20 +69,20 @@
           </button>
         </footer>
       </section>
-      </ng-view>
-      <footer id="info">
-        <p>Double-click to edit a todo</p>
-        <!-- Change this out with your name and url ↓ -->
-        <p>Created by <a href="http://todomvc.com">you</a></p>
-        <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
-      </footer>
+    </ng-view>
+    <footer id="info">
+      <p>Double-click to edit a todo</p>
+      <!-- Change this out with your name and url ↓ -->
+      <p>Created by <a href="http://todomvc.com">you</a></p>
+      <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+    </footer>
 
-      <!-- TODO: reninstate this before sending PR to todomvc -->
-      <!-- <script src="bower_components/todomvc-common/base.js"></script> -->
+    <!-- TODO: reninstate this before sending PR to todomvc -->
+    <!-- <script src="bower_components/todomvc-common/base.js"></script> -->
 
-      <script src="packages/shadow_dom/shadow_dom.min.js"></script>
-      <script type="application/dart" src="main.dart"></script>
-      <script src="packages/browser/dart.js"></script>
+    <script src="packages/shadow_dom/shadow_dom.min.js"></script>
+    <script type="application/dart" src="main.dart"></script>
+    <script src="packages/browser/dart.js"></script>
 
   </body>
 </html>
